@@ -22,8 +22,7 @@ library(reshape2);
 # turning off scientific notation of numbers
 options(scipen=999)
 
-#setwd("~/Desktop/")
-setwd("~/Dropbox/Documents/USB/600Research/631ResearchLanguageAccessNYC/LanguagesInNYC2024")
+setwd("~/Desktop/")
 
 # change the default width
 width.default <- getOption("width"); options(width=200)
