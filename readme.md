@@ -11,10 +11,8 @@ Tomonori Nagano
   NYC Department of City Planning and the U.S. Census data obtained
   through R’s tidycensus
 
-############################################################ 
 # Language Data from the NYC Department of City Planning
-############################################################ 
-# Setting up the environment
+## Setting up the environment
 
 ``` r
 # clear the cache
@@ -44,7 +42,7 @@ addComma<-function(x) {format(x, big.mark = ',', trim = TRUE, scientific = FALSE
 `%notin%` <- Negate(`%in%`)
 ```
 
-# Loading data
+## Loading data
 
 - The data files were obtained from the webpage of the NYC Department of
   City Planning on Saturday, March 23, 2024
@@ -63,7 +61,7 @@ thisData.totalPopulation = thisData[1,]
 thisData = thisData[-c(1),]
 ```
 
-# Analyzing data
+## Analyzing data
 
 - The total number of NYC population
 
@@ -472,14 +470,11 @@ round(prop.table(data.matrix(thisData),2)*100, 2)
     ## Cherokee                                                          0.00  0.00     0.00      0.00   0.00          0.00
     ## Apache languages                                                  0.00  0.00     0.00      0.00   0.00          0.00
 
-############################################################ 
 # NYC Neighborhood (NTA) Language Maps with ACS Data
-############################################################ 
+## 0. Package setup
 
-# 0. Package setup
-
+## 1. Configuration
 ``` r
-# 1. Configuration
 # ACS settings
 acs_year   <- 2023
 acs_survey <- "acs5"
@@ -591,7 +586,7 @@ out_dir <- "output"
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 ```
 
-# 2. Get NYC Neighborhood Tabulation Areas (NTAs)
+## 2. Get NYC Neighborhood Tabulation Areas (NTAs)
 
 ``` r
 ## Alternative: Load NYC‑only PUMA shapefile you downloaded
@@ -643,7 +638,7 @@ ggplot(nyc_pumas) +
 
 <img src="images/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
 
-# 3. Get ACS language data by census tract for NYC
+## 3. Get ACS language data by census tract for NYC
 
 ``` r
 message("Downloading ACS language data for NYC tracts...")
@@ -682,7 +677,7 @@ head(acs_puma)
     ## 5 3600100 St. Lawrence County PUMA; New York italian           243   117
     ## 6 3600100 St. Lawrence County PUMA; New York portuguese         43    48
 
-# 4. Join ACS data with PUMA shapefile
+## 4. Join ACS data with PUMA shapefile
 
 ``` r
 # Ensure the GEOID matches between ACS and shapefile; usually both have padded codes
@@ -706,7 +701,7 @@ if (nrow(missing) > 0) {
 }
 ```
 
-# 6. Plot choropleth map
+## 5. Plot choropleth map
 
 ``` r
 message("Creating choropleth map for Spanish speakers at home...")
