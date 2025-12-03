@@ -786,46 +786,5 @@ purrr::walk(names(lang_vars_total), make_lang_map)
 ```
 
 
-<a href="docs/LanguagesInNYC2025_ACS2023_khmer.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_khmer_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_amharic_somali_other_afro_asiatic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_amharic_somali_other_afro_asiatic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_arabic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_arabic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_armenian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_armenian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_bengali.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_bengali_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_chinese_mandarin_cantonese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_chinese_mandarin_cantonese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_english_only.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_english_only_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_french_cajun.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_french_cajun_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_german.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_german_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_greek.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_greek_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_gujarati.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_gujarati_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_haitian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_haitian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_hebrew.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_hebrew_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_hindi.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_hindi_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_hmong.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_hmong_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_ilocano_samoan_hawaiian_other_austronesian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_ilocano_samoan_hawaiian_other_austronesian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_italian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_italian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_japanese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_japanese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_korean.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_korean_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_malayalam_kannada_other_dravidian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_malayalam_kannada_other_dravidian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_navajo.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_navajo_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_nepali_marathi_other_indic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_nepali_marathi_other_indic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_other_asian_languages.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_asian_languages_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_other_indo_european.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_indo_european_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_other_native_north_american.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_native_north_american_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_other_unspecified.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_unspecified_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_persian_farsi_dari.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_persian_farsi_dari_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_polish.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_polish_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_portuguese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_portuguese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_punjabi.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_punjabi_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_russian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_russian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_serbo_croatian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_serbo_croatian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_spanish.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_spanish_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_swahili_other_africa.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_swahili_other_africa_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_tagalog_filipino.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_tagalog_filipino_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_tamil.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_tamil_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_telugu.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_telugu_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_thai_lao_other_tai_kadai.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_thai_lao_other_tai_kadai_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_ukrainian_other_slavic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_ukrainian_other_slavic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_urdu.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_urdu_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_vietnamese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_vietnamese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_yiddish_penn_dutch_west_germanic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_yiddish_penn_dutch_west_germanic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
-<a href="docs/LanguagesInNYC2025_ACS2023_yoruba_twi_igbo_other_west_africa.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_yoruba_twi_igbo_other_west_africa_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<img src="images/00_LanguagesInNYC2025_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/00_LanguagesInNYC2025_ACS2023_page2.jpg" style="display: block; margin: auto; width: 90%; " />
