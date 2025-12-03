@@ -1,29 +1,39 @@
 RProcedureLanguagesInNYC2024
 ================
 Tomonori Nagano
-2024-03-23
+2025-12-03
 
 # RProcedureLanguagesInNYC2024
 
 - Author: Tomonori Nagano <tnagano@lagcc.cuny.edu>
 - Date: Saturday, March 23, 2024
 - Script purpose: This R script will analyze the language data by the
-  NYC Department of City Planning
+  NYC Department of City Planning and the U.S. Census data obtained
+  through R’s tidycensus
 
-## Setting up the environment
+############################################################ 
+# Language Data from the NYC Department of City Planning
+############################################################ 
+# Setting up the environment
 
 ``` r
 # clear the cache
 rm(list = ls())
 
 library(ggplot2); library(xtable); library(gdata); library(Hmisc); library(RColorBrewer); library(foreign); 
+```
+
+    ## Warning: package 'Hmisc' was built under R version 4.3.3
+
+``` r
 library(reshape2); 
 
 # turning off scientific notation of numbers
 options(scipen=999)
 
-setwd("~/Desktop/")
-
+#setwd("~/Desktop/")
+knitr::opts_knit$set(root.dir = dirname(rstudioapi::getActiveDocumentContext()$path))
+    
 # change the default width
 width.default <- getOption("width"); options(width=200)
 
@@ -34,7 +44,7 @@ addComma<-function(x) {format(x, big.mark = ',', trim = TRUE, scientific = FALSE
 `%notin%` <- Negate(`%in%`)
 ```
 
-## Loading data
+# Loading data
 
 - The data files were obtained from the webpage of the NYC Department of
   City Planning on Saturday, March 23, 2024
@@ -53,7 +63,7 @@ thisData.totalPopulation = thisData[1,]
 thisData = thisData[-c(1),]
 ```
 
-## Analyzing data
+# Analyzing data
 
 - The total number of NYC population
 
@@ -461,3 +471,366 @@ round(prop.table(data.matrix(thisData),2)*100, 2)
     ## Iu Mien                                                           0.00  0.00     0.00      0.00   0.00          0.00
     ## Cherokee                                                          0.00  0.00     0.00      0.00   0.00          0.00
     ## Apache languages                                                  0.00  0.00     0.00      0.00   0.00          0.00
+
+############################################################ 
+# NYC Neighborhood (NTA) Language Maps with ACS Data
+############################################################ 
+
+# 0. Package setup
+
+``` r
+# 1. Configuration
+# ACS settings
+acs_year   <- 2023
+acs_survey <- "acs5"
+
+# NYC counties
+nyc_counties <- c("New York", "Kings", "Queens", "Bronx", "Richmond")
+
+
+## B16001 language variables
+# 1) TOTAL speakers (incl. those who speak English very well AND less than very well)
+lang_vars_total <- c(
+  # overall + English
+  english_only                               = "B16001_002",  # Speak only English
+
+  # individual languages / groups
+  spanish                                    = "B16001_003",
+  french_cajun                               = "B16001_006",
+  haitian                                    = "B16001_009",
+  italian                                    = "B16001_012",
+  portuguese                                 = "B16001_015",
+  german                                     = "B16001_018",
+  yiddish_penn_dutch_west_germanic           = "B16001_021",
+  greek                                      = "B16001_024",
+  russian                                    = "B16001_027",
+  polish                                     = "B16001_030",
+  serbo_croatian                             = "B16001_033",
+  ukrainian_other_slavic                     = "B16001_036",
+  armenian                                   = "B16001_039",
+  persian_farsi_dari                         = "B16001_042",
+  gujarati                                   = "B16001_045",
+  hindi                                      = "B16001_048",
+  urdu                                       = "B16001_051",
+  punjabi                                    = "B16001_054",
+  bengali                                    = "B16001_057",
+  nepali_marathi_other_indic                 = "B16001_060",
+  other_indo_european                        = "B16001_063",
+  telugu                                     = "B16001_066",
+  tamil                                      = "B16001_069",
+  malayalam_kannada_other_dravidian          = "B16001_072",
+  chinese_mandarin_cantonese                 = "B16001_075",
+  japanese                                   = "B16001_078",
+  korean                                     = "B16001_081",
+  hmong                                      = "B16001_084",
+  vietnamese                                 = "B16001_087",
+  khmer                                      = "B16001_090",
+  thai_lao_other_tai_kadai                   = "B16001_093",
+  other_asian_languages                      = "B16001_096",
+  tagalog_filipino                           = "B16001_099",
+  ilocano_samoan_hawaiian_other_austronesian = "B16001_102",
+  arabic                                     = "B16001_105",
+  hebrew                                     = "B16001_108",
+  amharic_somali_other_afro_asiatic          = "B16001_111",
+  yoruba_twi_igbo_other_west_africa          = "B16001_114",
+  swahili_other_africa                       = "B16001_117",
+  navajo                                     = "B16001_120",
+  other_native_north_american                = "B16001_123",
+  other_unspecified                          = "B16001_126"
+)
+
+# 2) Speakers who "Speak English very well" ONLY
+lang_vars_verywell <- c(
+  spanish                                    = "B16001_004",
+  french_cajun                               = "B16001_007",
+  haitian                                    = "B16001_010",
+  italian                                    = "B16001_013",
+  portuguese                                 = "B16001_016",
+  german                                     = "B16001_019",
+  yiddish_penn_dutch_west_germanic           = "B16001_022",
+  greek                                      = "B16001_025",
+  russian                                    = "B16001_028",
+  polish                                     = "B16001_031",
+  serbo_croatian                             = "B16001_034",
+  ukrainian_other_slavic                     = "B16001_037",
+  armenian                                   = "B16001_040",
+  persian_farsi_dari                         = "B16001_043",
+  gujarati                                   = "B16001_046",
+  hindi                                      = "B16001_049",
+  urdu                                       = "B16001_052",
+  punjabi                                    = "B16001_055",
+  bengali                                    = "B16001_058",
+  nepali_marathi_other_indic                 = "B16001_061",
+  other_indo_european                        = "B16001_064",
+  telugu                                     = "B16001_067",
+  tamil                                      = "B16001_070",
+  malayalam_kannada_other_dravidian          = "B16001_073",
+  chinese_mandarin_cantonese                 = "B16001_076",
+  japanese                                   = "B16001_079",
+  korean                                     = "B16001_082",
+  hmong                                      = "B16001_085",
+  vietnamese                                 = "B16001_088",
+  khmer                                      = "B16001_091",
+  thai_lao_other_tai_kadai                   = "B16001_094",
+  other_asian_languages                      = "B16001_097",
+  tagalog_filipino                           = "B16001_100",
+  ilocano_samoan_hawaiian_other_austronesian = "B16001_103",
+  arabic                                     = "B16001_106",
+  hebrew                                     = "B16001_109",
+  amharic_somali_other_afro_asiatic          = "B16001_112",
+  yoruba_twi_igbo_other_west_africa          = "B16001_115",
+  swahili_other_africa                       = "B16001_118",
+  navajo                                     = "B16001_121",
+  other_native_north_american                = "B16001_124",
+  other_unspecified                          = "B16001_127"
+)
+
+
+# Output directory
+out_dir <- "output"
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+```
+
+# 2. Get NYC Neighborhood Tabulation Areas (NTAs)
+
+``` r
+## Alternative: Load NYC‑only PUMA shapefile you downloaded
+## Replace with your actual path to the unzipped shapefile.
+## https://www.nyc.gov/content/planning/pages/resources/datasets/public-use-microdata-areas
+nyc_pumas <- st_read("~/Desktop/nypuma2020_25d/nypuma2020.shp")
+```
+
+    ## Reading layer `nypuma2020' from data source `/Users/tnagano/Desktop/nypuma2020_25d/nypuma2020.shp' using driver `ESRI Shapefile'
+    ## Simple feature collection with 55 features and 3 fields
+    ## Geometry type: MULTIPOLYGON
+    ## Dimension:     XY
+    ## Bounding box:  xmin: 913175.1 ymin: 120128.4 xmax: 1067383 ymax: 272844.3
+    ## Projected CRS: NAD83 / New York Long Island (ftUS)
+
+``` r
+# NYC data does not have GEOID, which is required to map the census data
+nyc_pumas <- nyc_pumas %>%
+  mutate(
+    # Ensure PUMAID is 5-digit string (pad with leading zeros if needed)
+    PUMA5 = sprintf("%05s", PUMA),
+    # Prepend state FIPS for New York ("36"), then form GEOID
+    GEOID = paste0("36", PUMA5)
+  )
+
+## The shape file is available at TIGRIS, but it does not show the water boundaries  
+## 1) Download NY State PUMAs (cartographic boundary for simpler polygons)
+#ny_pumas <- pumas(state = "NY", cb = TRUE, year = 2020)
+#
+## 2) Inspect names to confirm column holding GEOID
+#names(ny_pumas)
+## Commonly you’ll see GEOID20; verify if available
+#
+## 3) Filter to NYC PUMAs. 
+## A simple approach: filter by the county names in NYC (New York, Kings, Queens, Bronx, Richmond)
+## Hydrography for NYC counties
+#hydro <- purrr::map_df(
+#  c("New York","Kings","Queens","Bronx","Richmond"),
+#  ~ tigris::area_water(state = "NY", county = ., year = 2023)
+#)
+#nyc_pumas <- ny_pumas %>%
+#  filter(grepl("NYC-", NAMELSAD20))
+
+ggplot(nyc_pumas) +
+  geom_sf(fill = NA, color = "black") +
+  labs(title = "Filtered NYC PUMAs") +
+  theme_minimal()
+```
+
+<img src="images/unnamed-chunk-9-1.png" style="display: block; margin: auto;" />
+
+# 3. Get ACS language data by census tract for NYC
+
+``` r
+message("Downloading ACS language data for NYC tracts...")
+# Optional: inspect available ACS variables (do once and comment out later)
+# vars_acs <- load_variables(acs_year, acs_survey, cache = TRUE)
+# head(vars_acs)
+# View(vars_acs)   # then search for B16001 variables
+acs_puma <- tidycensus::get_acs(
+  geography = "puma",
+  state = "NY",
+  variables = lang_vars_total,
+  year = acs_year,
+  survey = acs_survey,
+  geometry = FALSE        # we’ll join to shapefile ourselves
+)
+
+# quick sanity check
+table(nchar(acs_puma$GEOID))   # should all be 7
+```
+
+    ## 
+    ##    7 
+    ## 6192
+
+``` r
+head(acs_puma)
+```
+
+    ## # A tibble: 6 × 5
+    ##   GEOID   NAME                               variable     estimate   moe
+    ##   <chr>   <chr>                              <chr>           <dbl> <dbl>
+    ## 1 3600100 St. Lawrence County PUMA; New York english_only    95357   999
+    ## 2 3600100 St. Lawrence County PUMA; New York spanish          1358   206
+    ## 3 3600100 St. Lawrence County PUMA; New York french_cajun      565   179
+    ## 4 3600100 St. Lawrence County PUMA; New York haitian            91    69
+    ## 5 3600100 St. Lawrence County PUMA; New York italian           243   117
+    ## 6 3600100 St. Lawrence County PUMA; New York portuguese         43    48
+
+# 4. Join ACS data with PUMA shapefile
+
+``` r
+# Ensure the GEOID matches between ACS and shapefile; usually both have padded codes
+map_data <- nyc_pumas %>%
+#  left_join(acs_puma, by = c("GEOID20" = "GEOID"))
+  right_join(acs_puma, by = c("GEOID"))
+
+# check for missing estimates after join
+table(is.na(map_data$estimate))
+```
+
+    ## 
+    ## FALSE 
+    ##  6192
+
+``` r
+# Check for unmatched PUMAs:
+missing <- filter(map_data, is.na(estimate))
+if (nrow(missing) > 0) {
+  warning("Some PUMAs have no ACS data — check GEOIDs / table availability.")
+}
+```
+
+# 6. Plot choropleth map
+
+``` r
+message("Creating choropleth map for Spanish speakers at home...")
+
+map_data <- map_data %>%
+  mutate(label = str_extract(NAME, "(?<=--).*?(?= PUMA)") |> str_trim(),
+         label = str_replace(label, " & ", " &\n"),
+         label = str_replace(label, ",", ",\n"))
+
+# Obtain the centroids for the label placement          
+nyc_map_centroids <- st_centroid(map_data)
+```
+
+    ## Warning: st_centroid assumes attributes are constant over geometries
+
+``` r
+# Color pallets
+white_viridis <- colorRampPalette(c("white", viridisLite::plasma(1)))
+
+
+# Creating an example map (Spanish only)
+map_spanish <- map_data %>%
+  filter(variable == "spanish")  # ← language name, not code
+
+ggplot(map_spanish) +
+  geom_sf(aes(fill = estimate), color = "black", size = 0.1) +
+  geom_sf_text(data = nyc_map_centroids, aes(label = label), size = 1) +
+  scale_fill_gradientn(colours  = white_viridis(50), name = "Estimate", labels = scales::comma, na.value = "grey90") +
+  labs(
+    title    = paste0("ACS ", acs_year, " (5-year) — Spanish speakers at home by NYC PUMA"),
+    subtitle = "Source: U.S. Census Bureau via tidycensus",
+    caption  = "Polygon = PUMA (≥ 100,000 pop.)"
+  ) +
+  theme_minimal() +
+  theme(panel.grid = element_blank(), axis.text  = element_blank(), axis.ticks = element_blank())
+```
+
+    ## Warning: Removed 3827 rows containing missing values or values outside the scale range (`geom_text()`).
+
+<img src="images/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
+
+``` r
+# create a lookup table so we can generate nicer titles
+
+# create a lookup table so we can generate nicer titles
+lang_lookup <- tibble(
+  lang_key = names(lang_vars_total),             # "spanish", "japanese", ...
+  var_code = as.character(lang_vars_total)       # "B16001_003", ...
+) %>%
+  mutate(
+    # nicer labels for titles
+    lang_label = str_replace_all(lang_key, "_", " ") |> str_to_title()
+  )
+
+# function that makes and saves ONE map for a given language key
+make_lang_map <- function(lang_key_in) {
+  this_row <- lang_lookup %>% filter(lang_key == lang_key_in)
+
+  this_lang <- this_row$lang_label[1] %||% lang_key_in
+  this_key  <- this_row$lang_key[1]   %||% lang_key_in
+
+  # filter to this language (remember: variable holds the language names)
+  df_lang <- map_data %>% filter(variable == lang_key_in)
+
+  p <- ggplot(df_lang) +
+    geom_sf(aes(fill = estimate), color = "black", size = 0.1) +
+    geom_sf_text(data = nyc_map_centroids, aes(label = label), size = 1) +
+    scale_fill_gradientn(colours  = white_viridis(50), name = "Estimate", labels = scales::comma, na.value = "grey90") +
+    labs(
+      title    = paste0("ACS ", acs_year, " (5-year) — ", this_lang, " by NYC PUMA"),
+      subtitle = "Source: U.S. Census Bureau via R tidycensus",
+      caption  = "Data table: B16001 Estimate of Language Spoken at Home; Polygon = PUMA (≥ 100,000 pop.)"
+    ) +
+    theme_minimal() +
+    theme(panel.grid = element_blank(), axis.text  = element_blank(), axis.ticks = element_blank()) 
+  out_file <- paste0("LanguagesInNYC2025_ACS2023_", this_key, ".pdf")
+  ggsave(out_file, plot = p, width = 12, height = 10, dpi = 300)
+}
+
+# run for ALL languages in lang_vars_total
+purrr::walk(names(lang_vars_total), make_lang_map)
+```
+
+
+<a href="docs/LanguagesInNYC2025_ACS2023_khmer.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_khmer_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_amharic_somali_other_afro_asiatic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_amharic_somali_other_afro_asiatic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_arabic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_arabic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_armenian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_armenian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_bengali.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_bengali_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_chinese_mandarin_cantonese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_chinese_mandarin_cantonese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_english_only.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_english_only_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_french_cajun.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_french_cajun_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_german.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_german_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_greek.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_greek_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_gujarati.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_gujarati_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_haitian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_haitian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_hebrew.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_hebrew_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_hindi.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_hindi_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_hmong.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_hmong_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_ilocano_samoan_hawaiian_other_austronesian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_ilocano_samoan_hawaiian_other_austronesian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_italian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_italian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_japanese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_japanese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_korean.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_korean_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_malayalam_kannada_other_dravidian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_malayalam_kannada_other_dravidian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_navajo.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_navajo_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_nepali_marathi_other_indic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_nepali_marathi_other_indic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_other_asian_languages.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_asian_languages_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_other_indo_european.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_indo_european_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_other_native_north_american.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_native_north_american_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_other_unspecified.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_other_unspecified_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_persian_farsi_dari.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_persian_farsi_dari_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_polish.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_polish_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_portuguese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_portuguese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_punjabi.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_punjabi_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_russian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_russian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_serbo_croatian.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_serbo_croatian_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_spanish.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_spanish_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_swahili_other_africa.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_swahili_other_africa_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_tagalog_filipino.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_tagalog_filipino_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_tamil.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_tamil_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_telugu.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_telugu_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_thai_lao_other_tai_kadai.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_thai_lao_other_tai_kadai_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_ukrainian_other_slavic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_ukrainian_other_slavic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_urdu.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_urdu_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_vietnamese.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_vietnamese_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_yiddish_penn_dutch_west_germanic.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_yiddish_penn_dutch_west_germanic_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
+<a href="docs/LanguagesInNYC2025_ACS2023_yoruba_twi_igbo_other_west_africa.pdf" target="_blank"><img src="images/LanguagesInNYC2025_ACS2023_yoruba_twi_igbo_other_west_africa_resized.jpg" style="display: block; margin: auto; width: 30%; " /></a>
