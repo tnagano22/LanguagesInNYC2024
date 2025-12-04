@@ -477,114 +477,38 @@ round(prop.table(data.matrix(thisData),2)*100, 2)
 ``` r
 # ACS settings
 acs_year   <- 2023
-acs_survey <- "acs5"
+acs_survey <- "acs5" # acs5 (American Community Survey 5 years) is valid only after 2009. acs1 is available from 2005
 
 # NYC counties
 nyc_counties <- c("New York", "Kings", "Queens", "Bronx", "Richmond")
 
+# b16001_vars: data frame with columns name, label, concept, geography
+# e.g. b16001_vars <- load_variables(2022, "acs5", "B16001")
+vars_acs <- load_variables(acs_year, acs_survey, cache = TRUE)
+make_clean_name <- function(x) {
+  x %>%
+    str_to_lower() %>%
+    str_replace_all("[^a-z0-9]+", "_") %>%  # non-alnum → _
+    str_replace_all("_+", "_") %>%          # collapse multiple _
+    str_replace("^_|_$", "")                # trim leading/trailing _
+}
 
-## B16001 language variables
-# 1) TOTAL speakers (incl. those who speak English very well AND less than very well)
-lang_vars_total <- c(
-  # overall + English
-  english_only                               = "B16001_002",  # Speak only English
+lang_df <- vars_acs %>%
+  # keep only B16001_* variables
+  filter(str_starts(name, "B16001_")) %>%
+  # keep only Estimate!!Total!!<language> (exactly 2 "!!")
+  filter(str_detect(label, "^Estimate!!Total:?!!"),
+         str_count(label, "!!") == 2) %>%
+  # drop the grand total row if present (B16001_001)
+  filter(name != "B16001_001") %>%
+  mutate(
+    language   = str_remove(label, "^Estimate!!Total!!"),
+    clean_name = make_clean_name(language)
+  )
 
-  # individual languages / groups
-  spanish                                    = "B16001_003",
-  french_cajun                               = "B16001_006",
-  haitian                                    = "B16001_009",
-  italian                                    = "B16001_012",
-  portuguese                                 = "B16001_015",
-  german                                     = "B16001_018",
-  yiddish_penn_dutch_west_germanic           = "B16001_021",
-  greek                                      = "B16001_024",
-  russian                                    = "B16001_027",
-  polish                                     = "B16001_030",
-  serbo_croatian                             = "B16001_033",
-  ukrainian_other_slavic                     = "B16001_036",
-  armenian                                   = "B16001_039",
-  persian_farsi_dari                         = "B16001_042",
-  gujarati                                   = "B16001_045",
-  hindi                                      = "B16001_048",
-  urdu                                       = "B16001_051",
-  punjabi                                    = "B16001_054",
-  bengali                                    = "B16001_057",
-  nepali_marathi_other_indic                 = "B16001_060",
-  other_indo_european                        = "B16001_063",
-  telugu                                     = "B16001_066",
-  tamil                                      = "B16001_069",
-  malayalam_kannada_other_dravidian          = "B16001_072",
-  chinese_mandarin_cantonese                 = "B16001_075",
-  japanese                                   = "B16001_078",
-  korean                                     = "B16001_081",
-  hmong                                      = "B16001_084",
-  vietnamese                                 = "B16001_087",
-  khmer                                      = "B16001_090",
-  thai_lao_other_tai_kadai                   = "B16001_093",
-  other_asian_languages                      = "B16001_096",
-  tagalog_filipino                           = "B16001_099",
-  ilocano_samoan_hawaiian_other_austronesian = "B16001_102",
-  arabic                                     = "B16001_105",
-  hebrew                                     = "B16001_108",
-  amharic_somali_other_afro_asiatic          = "B16001_111",
-  yoruba_twi_igbo_other_west_africa          = "B16001_114",
-  swahili_other_africa                       = "B16001_117",
-  navajo                                     = "B16001_120",
-  other_native_north_american                = "B16001_123",
-  other_unspecified                          = "B16001_126"
-)
-
-# 2) Speakers who "Speak English very well" ONLY
-lang_vars_verywell <- c(
-  spanish                                    = "B16001_004",
-  french_cajun                               = "B16001_007",
-  haitian                                    = "B16001_010",
-  italian                                    = "B16001_013",
-  portuguese                                 = "B16001_016",
-  german                                     = "B16001_019",
-  yiddish_penn_dutch_west_germanic           = "B16001_022",
-  greek                                      = "B16001_025",
-  russian                                    = "B16001_028",
-  polish                                     = "B16001_031",
-  serbo_croatian                             = "B16001_034",
-  ukrainian_other_slavic                     = "B16001_037",
-  armenian                                   = "B16001_040",
-  persian_farsi_dari                         = "B16001_043",
-  gujarati                                   = "B16001_046",
-  hindi                                      = "B16001_049",
-  urdu                                       = "B16001_052",
-  punjabi                                    = "B16001_055",
-  bengali                                    = "B16001_058",
-  nepali_marathi_other_indic                 = "B16001_061",
-  other_indo_european                        = "B16001_064",
-  telugu                                     = "B16001_067",
-  tamil                                      = "B16001_070",
-  malayalam_kannada_other_dravidian          = "B16001_073",
-  chinese_mandarin_cantonese                 = "B16001_076",
-  japanese                                   = "B16001_079",
-  korean                                     = "B16001_082",
-  hmong                                      = "B16001_085",
-  vietnamese                                 = "B16001_088",
-  khmer                                      = "B16001_091",
-  thai_lao_other_tai_kadai                   = "B16001_094",
-  other_asian_languages                      = "B16001_097",
-  tagalog_filipino                           = "B16001_100",
-  ilocano_samoan_hawaiian_other_austronesian = "B16001_103",
-  arabic                                     = "B16001_106",
-  hebrew                                     = "B16001_109",
-  amharic_somali_other_afro_asiatic          = "B16001_112",
-  yoruba_twi_igbo_other_west_africa          = "B16001_115",
-  swahili_other_africa                       = "B16001_118",
-  navajo                                     = "B16001_121",
-  other_native_north_american                = "B16001_124",
-  other_unspecified                          = "B16001_127"
-)
-
-
-# Output directory
-out_dir <- "output"
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-```
+# Named vector: clean_name -> ACS variable code
+lang_vars_total <- setNames(lang_df$name, lang_df$clean_name)
+lang_vars_total```
 
 ## 2. Get NYC Neighborhood Tabulation Areas (NTAs)
 
@@ -592,7 +516,11 @@ if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 ## Alternative: Load NYC‑only PUMA shapefile you downloaded
 ## Replace with your actual path to the unzipped shapefile.
 ## https://www.nyc.gov/content/planning/pages/resources/datasets/public-use-microdata-areas
-nyc_pumas <- st_read("~/Desktop/nypuma2020_25d/nypuma2020.shp")
+if (acs_year < 2023) {
+  nyc_pumas <- st_read("nypuma2010_25d/nypuma2010.shp")
+} else {
+  nyc_pumas <- st_read("nypuma2020_25d/nypuma2020.shp")
+}
 ```
 
     ## Reading layer `nypuma2020' from data source `/Users/tnagano/Desktop/nypuma2020_25d/nypuma2020.shp' using driver `ESRI Shapefile'
@@ -721,7 +649,6 @@ nyc_map_centroids <- st_centroid(map_data)
 # Color pallets
 white_viridis <- colorRampPalette(c("white", viridisLite::plasma(1)))
 
-
 # Creating an example map (Spanish only)
 map_spanish <- map_data %>%
   filter(variable == "spanish")  # ← language name, not code
@@ -739,8 +666,6 @@ ggplot(map_spanish) +
   theme(panel.grid = element_blank(), axis.text  = element_blank(), axis.ticks = element_blank())
 ```
 
-    ## Warning: Removed 3827 rows containing missing values or values outside the scale range (`geom_text()`).
-
 <img src="images/unnamed-chunk-12-1.png" style="display: block; margin: auto;" />
 
 ``` r
@@ -756,28 +681,36 @@ lang_lookup <- tibble(
     lang_label = str_replace_all(lang_key, "_", " ") |> str_to_title()
   )
 
+# Output directory
+out_dir <- "output"
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+
 # function that makes and saves ONE map for a given language key
-make_lang_map <- function(lang_key_in) {
-  this_row <- lang_lookup %>% filter(lang_key == lang_key_in)
+make_lang_map <- function(lang_key_in) {   # <— use lang_key_in as the argument
+
+  # look up pretty label etc. in your lookup table
+  this_row <- lang_lookup %>% 
+    dplyr::filter(lang_key == lang_key_in)
 
   this_lang <- this_row$lang_label[1] %||% lang_key_in
   this_key  <- this_row$lang_key[1]   %||% lang_key_in
 
-  # filter to this language (remember: variable holds the language names)
-  df_lang <- map_data %>% filter(variable == lang_key_in)
+  # filter to this language (variable column holds the language key)
+  df_lang <- map_data %>% 
+    dplyr::filter(variable == lang_key_in)
 
   p <- ggplot(df_lang) +
     geom_sf(aes(fill = estimate), color = "black", size = 0.1) +
     geom_sf_text(data = nyc_map_centroids, aes(label = label), size = 1) +
-    scale_fill_gradientn(colours  = white_viridis(50), name = "Estimate", labels = scales::comma, na.value = "grey90") +
+    scale_fill_gradientn(colours  = white_viridis(50), name = "Estimate", labels   = scales::comma, na.value = "grey90") +
     labs(
       title    = paste0("ACS ", acs_year, " (5-year) — ", this_lang, " by NYC PUMA"),
       subtitle = "Source: U.S. Census Bureau via R tidycensus",
       caption  = "Data table: B16001 Estimate of Language Spoken at Home; Polygon = PUMA (≥ 100,000 pop.)"
     ) +
     theme_minimal() +
-    theme(panel.grid = element_blank(), axis.text  = element_blank(), axis.ticks = element_blank()) 
-  out_file <- paste0("LanguagesInNYC2025_ACS2023_", this_key, ".pdf")
+    theme(panel.grid  = element_blank(), axis.text   = element_blank(), axis.ticks  = element_blank())
+  out_file <- paste0("output/LanguagesInNYC2025_ACS", acs_year, "_", this_key, ".pdf")
   ggsave(out_file, plot = p, width = 12, height = 10, dpi = 300)
 }
 
@@ -785,6 +718,22 @@ make_lang_map <- function(lang_key_in) {
 purrr::walk(names(lang_vars_total), make_lang_map)
 ```
 
+- See "docs" for the pdf outputs for 2023, 2020, 2015, and 2010 (the oldest ACS 5-years is 2009).
 
-<img src="images/00_LanguagesInNYC2025_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
-<img src="images/00_LanguagesInNYC2025_ACS2023_page2.jpg" style="display: block; margin: auto; width: 90%; " />
+## 2023
+<img src="images/LanguagesInNYC2025_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/LanguagesInNYC2025_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+
+## 2020
+<img src="images/LanguagesInNYC2025_ACS2020_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/LanguagesInNYC2025_ACS2020_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+
+## 2015
+<img src="images/LanguagesInNYC2015_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/LanguagesInNYC2015_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+
+## 2010
+<img src="images/LanguagesInNYC2025_ACS2010_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/LanguagesInNYC2025_ACS2010_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+
+
