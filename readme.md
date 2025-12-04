@@ -729,8 +729,8 @@ purrr::walk(names(lang_vars_total), make_lang_map)
 <img src="images/LanguagesInNYC2025_ACS2020_page1.jpg" style="display: block; margin: auto; width: 90%; " />
 
 ## 2015
-<img src="images/LanguagesInNYC2015_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
-<img src="images/LanguagesInNYC2015_ACS2023_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/LanguagesInNYC2025_ACS2015_page1.jpg" style="display: block; margin: auto; width: 90%; " />
+<img src="images/LanguagesInNYC2025_ACS2015_page1.jpg" style="display: block; margin: auto; width: 90%; " />
 
 ## 2010
 <img src="images/LanguagesInNYC2025_ACS2010_page1.jpg" style="display: block; margin: auto; width: 90%; " />
